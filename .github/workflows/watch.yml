@@ -28,7 +28,7 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-        run: python src/ttd_watcher.py
+        run: python src/tirumala.py
 
       - name: Save state
         run: |
