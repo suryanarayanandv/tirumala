@@ -16,8 +16,8 @@ jobs:
   check:
     runs-on: ubuntu-24.04        # was: ubuntu-latest (pins the OS so it doesn't change on you)
     steps:
-      - uses: actions/checkout@v5          # was @v4
-      - uses: actions/setup-python@v6      # was @v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
