@@ -2,8 +2,8 @@ import json, hashlib, os, re, requests
 
 URL = "https://ttdevasthanams.ap.gov.in/cms/api/universal-latest-updates?populate=*"
 STATE_FILE = "seen.json"
-BOT_TOKEN = "9120258671:AAEIXpQabcULQfcEodbc7PkoYsbt5738nL4"
-CHAT_ID   = 1580107056
+BOT_TOKEN = os.environ["TG_BOT_TOKEN"]
+CHAT_ID   = os.environ["TG_CHAT_ID"]
 
 def fetch_updates():
     r = requests.get(URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
