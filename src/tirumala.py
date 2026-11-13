@@ -3,8 +3,8 @@ import sys
 
 URL = "https://ttdevasthanams.ap.gov.in/cms/api/universal-latest-updates?populate=*"
 STATE_FILE = "seen.json"
-BOT_TOKEN = "9120258671:AAEIXpQabcULQfcEodbc7PkoYsbt5738nL4"
-CHAT_ID   = 1580107056
+BOT_TOKEN = os.environ["TG_BOT_TOKEN"]   # from @BotFather
+CHAT_ID   = os.environ["TG_CHAT_ID"]
 
 import time
 
