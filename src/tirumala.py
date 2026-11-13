@@ -1,21 +1,34 @@
 import json, hashlib, os, re, requests
+import sys
 
 URL = "https://ttdevasthanams.ap.gov.in/cms/api/universal-latest-updates?populate=*"
 STATE_FILE = "seen.json"
-BOT_TOKEN = os.environ["TG_BOT_TOKEN"]
-CHAT_ID   = os.environ["TG_CHAT_ID"]
+BOT_TOKEN = "9120258671:AAEIXpQabcULQfcEodbc7PkoYsbt5738nL4"
+CHAT_ID   = 1580107056
+
+import time
 
 def fetch_updates():
-    r = requests.get(URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
-    r.raise_for_status()
+    last_err = None
+    for attempt in range(4):                      # try up to 4 times
+        try:
+            r = requests.get(URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            r.raise_for_status()
+            break
+        except requests.exceptions.RequestException as e:
+            last_err = e
+            print(f"Attempt {attempt + 1} failed: {e}")
+            time.sleep(15 * (attempt + 1))        # wait 15s, 30s, 45s...
+    else:
+        raise ConnectionError(f"TTD site unreachable after 4 tries: {last_err}")
+
     items = []
     for block in r.json()["data"]:
         for u in block["attributes"]["update"]:
             text = u["data"].strip()
-            print(f"text: {text}")
-            # turn markdown links [Click Here](/path) into full URLs
             text = re.sub(r"\[([^\]]+)\]\((/[^)]+)\)",
                           r"\1: https://ttdevasthanams.ap.gov.in\2", text)
+            text = text.replace("**", "")
             items.append({"id": u["id"], "text": text,
                           "hash": hashlib.md5(text.encode()).hexdigest()})
     return items
@@ -40,4 +53,13 @@ def main():
     json.dump(new_state, open(STATE_FILE, "w"))
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except ConnectionError as e:
+        # Network problem: skip this check, don't spam Telegram, don't fail the run
+        print(f"::warning::{e}")
+        sys.exit(0)
+    except Exception as e:
+        # Anything else (e.g. TTD changed the data format) is a real problem: alert
+        notify(f"⚠️ TTD watcher error: {e}")
+        sys.exit(1)
